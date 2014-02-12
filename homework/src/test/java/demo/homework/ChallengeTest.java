@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ChallengeTest {
-
+	
 	private RailService railService;
 	
 	@Before
@@ -114,6 +114,12 @@ public class ChallengeTest {
 		print(search);
 
 	}
+	
+
+
+	
+	
+	private boolean print = false; //toggle to see println.
 
 	private void print(List<Way> search) {
 		for (Way way : search)
@@ -121,7 +127,8 @@ public class ChallengeTest {
 	}
 
 	private void print(Way way) {
-		System.out.println(way.getPath()+" : "+way.getDistance());
+		if(print)
+			System.out.println(way.getPath()+" : "+way.getDistance());
 	}
 
 }

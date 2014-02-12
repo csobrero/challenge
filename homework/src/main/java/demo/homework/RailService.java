@@ -8,7 +8,7 @@ public interface RailService {
 
 	String getAllPaths();
 
-	Integer calculateDistance(String string);
+	Integer calculateDistance(String itinerary);
 
 	List<Way> search(String from, String to, Condition<Way> condition);
 

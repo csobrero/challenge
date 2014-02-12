@@ -56,6 +56,10 @@ public class RailServiceImpl implements RailService {
 		return total;
 	}
 	
+	/**
+	 * Shortest way are 'direct way' or 'one-loop way' no other possible
+	 * combination.
+	 */
 	public Way searchShortest(final String from, final String to) {
 		List<Way> ways = search(from, to, new Condition<Way>() {
 
@@ -71,11 +75,16 @@ public class RailServiceImpl implements RailService {
 		return Collections.min(ways);
 	}
 	
+	
+	/**
+	 * Will recursively look for new way that may apply finally will filter
+	 * strict apply rule.
+	 */
 	public List<Way> search(String from, String to, Condition<Way> condition){
 		
 		List<Way> ways = new ArrayList<Way>();
-		lookupForWays(from, null, ways, condition);
-		recursiveLookup(ways, condition);
+		checkConditions(from, null, ways, condition); //initialize ways.
+		lookup(ways, condition);
 		
 		List<Way> results = new ArrayList<Way>();
 		for (Way way : ways) {
@@ -86,7 +95,19 @@ public class RailServiceImpl implements RailService {
 		return results;
 	}
 
-	private void lookupForWays(String from, Way way, List<Way> ways, Condition<Way> condition) {
+	/**
+	 * Cloned node will be skipped just new ones will be looked up checking if
+	 * needed condition apply.
+	 * 
+	 * @param from
+	 * @param way
+	 * @param ways
+	 * @param condition
+	 */
+	private void checkConditions(String from, Way way, List<Way> ways, Condition<Way> condition) {
+		if (way != null && way.isCloned())
+			return;
+		
 		Node node = nodeManager.getNode(from);
 		for (Node next : node.getNodes()) {
 			Way w = (way == null) ? new Way(node, next, node.getDistance(next))
@@ -97,14 +118,20 @@ public class RailServiceImpl implements RailService {
 		}
 	}
 	
-	private void recursiveLookup(List<Way> ways, Condition<Way> condition){
+	/**
+	 * Recursion will ends when no new ways are added.
+	 * 
+	 * @param ways
+	 * @param condition
+	 */
+	private void lookup(List<Way> ways, Condition<Way> condition){
 		List<Way> copy = new ArrayList<Way>(ways);
 		for (Way way : copy) {
-			if(!way.isCloned())
-				lookupForWays(way.getLast(), way, ways, condition);
+				checkConditions(way.getLast(), way, ways, condition);
 		}
+		
 		if(ways.size()>copy.size()){
-			recursiveLookup(ways, condition);
+			lookup(ways, condition);
 		}
 	}
 
